@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/integration"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:int-ftp="http://www.springframework.org/schema/integration/ftp"
+	xmlns:file="http://www.springframework.org/schema/integration/file"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/integration
+		http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/integration/ftp
+		http://www.springframework.org/schema/integration/ftp/spring-integration-ftp.xsd
+		http://www.springframework.org/schema/integration/file
+		http://www.springframework.org/schema/integration/file/spring-integration-file.xsd">
+
+	<beans:bean id="ftpSessionFactory" class="org.springframework.integration.ftp.session.DefaultFtpSessionFactory">
+		<beans:property name="host" value="${ftpHost}" />
+			<beans:property name="port" value="${ftpPort}" />
+			<beans:property name="username" value="${ftpUserName}"/>
+			<beans:property name="password" value="${ftpPassWord}"/>
+			<beans:property name="clientMode" value="2"/>
+	</beans:bean>
+
+	<int-ftp:inbound-channel-adapter auto-startup="false" channel="output" session-factory="ftpSessionFactory" filter="acceptOnceFilter"
+		remote-directory="${remoteDir}" local-directory="${localDir}"
+		remote-file-separator="/" preserve-timestamp="true"
+		auto-create-local-directory="true"
+		temporary-file-suffix=".tmp" delete-remote-files="false">
+		<poller trigger="trigger" max-messages-per-poll="10" />
+	</int-ftp:inbound-channel-adapter>
+	
+	<beans:bean id="metadataStore" class="org.springframework.integration.redis.metadata.RedisMetadataStore">
+		<beans:constructor-arg name="connectionFactory" ref="redisConnectionFactory"/>
+	</beans:bean> 
+	
+	<beans:bean id="redisConnectionFactory" lazy-init="true"
+			class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+		<beans:property name="hostName" value="${redisHost}" />
+		<beans:property name="port" value="${redisPort}" />
+	</beans:bean>
+
+	<beans:bean id="acceptOnceFilter"
+		class="org.springframework.integration.ftp.filters.FtpPersistentAcceptOnceFileListFilter">
+		<beans:constructor-arg name="store" ref="metadataStore" />
+		<beans:constructor-arg name="prefix" value="test-" />
+	</beans:bean>
+	
+	<beans:bean id="trigger" class="org.springframework.scheduling.support.PeriodicTrigger">
+		<beans:constructor-arg value="1000" />
+		<beans:property name="initialDelay" value="0"/>
+	</beans:bean>
+
+	<channel id="output" />
+
+</beans:beans>

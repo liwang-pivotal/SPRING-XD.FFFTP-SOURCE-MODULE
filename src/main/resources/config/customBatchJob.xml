@@ -26,7 +26,7 @@
 		remote-file-separator="/" preserve-timestamp="true"
 		auto-create-local-directory="true"
 		temporary-file-suffix=".tmp" delete-remote-files="false">
-		<poller trigger="trigger" max-messages-per-poll="1" />
+		<poller trigger="trigger" max-messages-per-poll="10" />
 	</int-ftp:inbound-channel-adapter>
 	
 	<beans:bean id="metadataStore" class="org.springframework.integration.redis.metadata.RedisMetadataStore">

@@ -1,0 +1,14 @@
+// XD Shell 1.1.0.RELEASE log opened at 2015-09-02 16:06:37
+stream create test --definition "FFFTP --ftpHost=localhost --ftpPassWord=890513wl --ftpUserName=lwang --localDir=/Users/lwang/Desktop/out --remoteDir=/Users/lwang/Desktop/ftp --redisHost=localhost | log" --deploy 
+stream destroy --name test 
+// [failed] module list
+// [failed] module list
+exit
+// XD Shell 1.1.0.RELEASE log closed at 2015-09-02 19:25:59
+// XD Shell 1.1.0.RELEASE log opened at 2015-09-02 19:26:37
+module list
+stream create test --definition "s3 --propertiesFile=/Users/lwang/Desktop/AwsCredentials.properties --bucket=liwang-001 --remoteDir=/ --localDir=/Users/lwang/Desktop/s3 --fixedDelay=5000 | null" --deploy 
+stream destroy --name test 
+stream create test --definition "s3 --propertiesFile=/Users/lwang/Desktop/AwsCredentials.properties --bucket=liwang0513-001 --remoteDir=/ --localDir=/Users/lwang/Desktop/s3 --fixedDelay=5000 | null" --deploy 
+stream list
+stream destroy --name test 
